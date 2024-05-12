@@ -24,10 +24,19 @@ const errorCounter = new client.Counter({
   help: "Total number of errors",
 });
 
+// Define your metrics
+const healthMetric = new client.Gauge({
+  name: "application_health",
+  help: "Health of the application, 1 for up, 0 for down",
+});
+// Initially set health to up
+healthMetric.set(1);
+
 register.registerMetric(headsCount);
 register.registerMetric(tailsCount);
 register.registerMetric(flipCount);
 register.registerMetric(errorCounter);
+register.registerMetric(healthMetric);
 
 register.setDefaultLabels({
   app: "coin-api",
@@ -56,11 +65,9 @@ app.get("/flip-coins", (request, response) => {
     response.json({ heads, tails });
   } else {
     errorCounter.inc(); // Increment the error counter on invalid input
-    response
-      .status(400)
-      .json({
-        error: "Please provide a valid number of times greater than zero.",
-      });
+    response.status(400).json({
+      error: "Please provide a valid number of times greater than zero.",
+    });
   }
 });
 
@@ -121,9 +128,11 @@ app.get("/flip-random", (req, res) => {
 
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ status: "Up", timestamp: new Date().toISOString() });
+  const health = { status: "Up", timestamp: new Date().toISOString() };
+  // You might want to actually perform checks and set health status accordingly
+  healthMetric.set(1); // Set to 0 if the application is considered down
+  res.json(health);
 });
-
 app.get("/metrics", async (request, response) => {
   response.setHeader("Content-type", register.contentType);
   response.end(await register.metrics());

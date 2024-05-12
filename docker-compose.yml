@@ -37,23 +37,6 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - "9090:9090"
-  alertmanager:
-    image: prom/alertmanager:v0.23.0
-    restart: unless-stopped
-    ports:
-      - "9093:9093"
-    volumes:
-      - "./alertmanager:/config"
-      - alertmanager-data:/data
-    command: --config.file=/config/alertmanager.yml --log.level=debug --cluster.advertise-address=0.0.0.0:9093
-  discord-alerts:
-    image: benjojo/alertmanager-discord
-    container_name: discord-alerts
-    restart: unless-stopped
-    environment:
-      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK_URL}
-    ports:
-      - 9094:9094
   grafana:
     image: grafana/grafana:latest
     container_name: coin-api-grafana

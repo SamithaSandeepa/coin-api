@@ -24,12 +24,10 @@ const errorCounter = new client.Counter({
   help: "Total number of errors",
 });
 
-// Define your metrics
 const healthMetric = new client.Gauge({
   name: "application_health",
   help: "Health of the application, 1 for up, 0 for down",
 });
-// Initially set health to up
 healthMetric.set(1);
 
 register.registerMetric(headsCount);
